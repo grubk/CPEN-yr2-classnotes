@@ -530,3 +530,73 @@ A:
 N:
     .word (Aend-A)/4
 ```
+
+#pagebreak()
+
+= 2025-11-04 Bare Metal Programming
+
+Operating system:
+- Control access to shared resources
+- memory, CPU, disk, screens, etc.
+- allow multiple programs to share resources
+
+Bare metal programming:
+- No OS
+- Not good for sharing resources between programs
+
+== LEDR and SW
+LEDR:
+- Address 0xFF200000: only last 10 bits are used
+
+SW:
+- Address: 0xFF2000040: only last 10 bits are used
+
+```yasm
+# read switches [9:0]
+la t0, SW_BASE # addr. 0XFF2000040
+lw t1, 0(t0)
+# write LEDR[9:0]
+la t2, LEDR_BASE # addr. 0xFF200000
+sw t1, 0(t2)
+# Continuously copy SW to LEDR
+loop:
+  lw t1, 0(t0)
+  sw t1, 0(t2)
+  j loop
+```
+
+== KEY[1:0]
+- Can directly read KEYS
+- Can configure to send "interrupts" to CPU
+
+== Time Delay
+- Do nothing: `nop`
+
+```yasm
+# Program to blink LED with time delay here```
+
+
+== HEX Display
+
+== VGA Output
+
+== JTAG UART
+- can print a character on the screen
+
+```yasm
+.equ JTAG_UART_BASE, 0xFF201000
+
+.global _start
+_start:
+  la t0, JTAG_UART_BASE
+  li t1, 'C'
+  sw t1, 0(t0)
+  li t1, 'P'
+  sw t1, 0(t0)
+  li t1, 'E'
+  sw t1, 0(t0)
+  li t1, 'N'
+  sw t1, 0(t0)
+stop:
+  j stop
+```
